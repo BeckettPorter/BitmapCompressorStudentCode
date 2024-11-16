@@ -25,9 +25,11 @@
  *  @author Zach Blick
  *  @author YOUR NAME HERE
  */
-public class BitmapCompressor {
-
-    final static short BLOCK_SIZE = 16;
+public class BitmapCompressor
+{
+    // Variable which tells the compressor how many bits to allocate for storing the length of a block,
+    // 8 seems to work well and only occasionally overflows (which I added a check for so that is handled).
+    final static short BLOCK_SIZE = 8;
 
     /**
      * Reads a sequence of bits from standard input, compresses them,
@@ -35,38 +37,54 @@ public class BitmapCompressor {
      */
     public static void compress()
     {
-        // First bit is what the block is (either 1 or 0) and the next 5 are the length of the block.
-        boolean bit = BinaryStdIn.readBoolean();
-
-        // Write the initial bit to indicate what this block represents (Either a 0 or 1).
-        BinaryStdOut.write(bit);
-
-        short blockLength = 1;
+        boolean bit;
+        short length;
+        // Set the nextBit to the first bit here so that logic below will work so that nextBit can be carried
+        // over throughout subsequent runs through the main while loop.
+        boolean nextBit = BinaryStdIn.readBoolean();
 
         while (!BinaryStdIn.isEmpty())
         {
+            // First bit is what the block is (either 1 or 0) and the next BLOCK_LENGTH - 1 are the length of the block.
+            bit = nextBit;
+
+            // Write the initial bit to indicate what this block represents (Either a 0 or 1).
+            BinaryStdOut.write(bit);
+
             // Get the next bit in the sequence.
-            boolean nextBit = BinaryStdIn.readBoolean();
+            nextBit = BinaryStdIn.readBoolean();
 
-            // If this next bit differs from the first bit we got, end the block and write out the size.
-            if (bit != nextBit)
+            // Set the sequence length to 1 to show it is a new block.
+            length = 1;
+
+            // If this next bit differs from the first bit we got (the one indicating what the block represents),
+            // end the block and write out the size.
+            while (bit == nextBit)
             {
-                // Write out the blockLength for BLOCK_SIZE - 1 bits.
-                BinaryStdOut.write(blockLength, BLOCK_SIZE - 1);
+                // Check if the sequence length will overflow the allocated block size, and if so,
+                // break and start a new block.
+                if (length >= Math.pow(2, BLOCK_SIZE - 1) - 1)
+                {
+                    break;
+                }
 
-                bit = nextBit;
-                blockLength = 1;
+                // Increment length as a match between bit and the next bit was found.
+                length++;
 
-                BinaryStdOut.write(bit);
+                // Make sure there is still something in the input to read before reading the next boolean.
+                if (!BinaryStdIn.isEmpty())
+                {
+                    nextBit = BinaryStdIn.readBoolean();
+                }
+                // If there isn't, break and exit the while loop and finish up this final block by writing the length.
+                else
+                {
+                    break;
+                }
             }
-            else
-            {
-                blockLength++;
-            }
+            // Write out the length of the found sequence for BLOCK_SIZE - 1 bits.
+            BinaryStdOut.write(length, BLOCK_SIZE - 1);
         }
-
-        // Write the final block length for the last block
-        BinaryStdOut.write(blockLength, BLOCK_SIZE - 1);
 
         BinaryStdOut.close();
     }
@@ -77,16 +95,20 @@ public class BitmapCompressor {
      */
     public static void expand()
     {
-
+        // Instance variables for the bit indicating what the block type is and the number of these bits to print.
         boolean bitToPrint;
         int numBitsToPrint;
 
+        // Go until there is no more input to be read.
         while (!BinaryStdIn.isEmpty())
         {
+            // The initial bit in the block is what type of bit the block represents.
             bitToPrint = BinaryStdIn.readBoolean();
 
+            // Then read the next BLOCK_SIZE - 1 bits which indicates the number of these bits to write out.
             numBitsToPrint = BinaryStdIn.readInt(BLOCK_SIZE - 1);
 
+            // Then write out that number of those bits.
             for (int i = 0; i < numBitsToPrint; i++)
             {
                 BinaryStdOut.write(bitToPrint);

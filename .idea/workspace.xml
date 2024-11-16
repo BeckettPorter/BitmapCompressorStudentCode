@@ -4,9 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5344144c-2391-49b9-ba87-481b14af2cb8" name="Changes" comment="">
+    <list default="true" id="5344144c-2391-49b9-ba87-481b14af2cb8" name="Changes" comment="Refactored compress method">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WORK_LOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/WORK_LOG.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/BitmapCompressor.class" beforeDir="false" afterPath="$PROJECT_DIR$/src/BitmapCompressor.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/BitmapCompressor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/BitmapCompressor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/qCompressed.bin" beforeDir="false" afterPath="$PROJECT_DIR$/src/qCompressed.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/qUncompressed.bin" beforeDir="false" afterPath="$PROJECT_DIR$/src/qUncompressed.bin" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,6 +57,19 @@
       <option name="presentableId" value="Default" />
       <updated>1723576628269</updated>
     </task>
+    <task id="LOCAL-00001" summary="Refactored compress method">
+      <option name="closed" value="true" />
+      <created>1731780885858</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1731780885858</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Refactored compress method" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactored compress method" />
   </component>
 </project>
