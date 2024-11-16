@@ -27,13 +27,46 @@
  */
 public class BitmapCompressor {
 
+    final static short BLOCK_SIZE = 16;
+
     /**
      * Reads a sequence of bits from standard input, compresses them,
      * and writes the results to standard output.
      */
-    public static void compress() {
+    public static void compress()
+    {
+        // First bit is what the block is (either 1 or 0) and the next 5 are the length of the block.
+        boolean bit = BinaryStdIn.readBoolean();
 
-        // TODO: complete compress()
+        // Write the initial bit to indicate what this block represents (Either a 0 or 1).
+        BinaryStdOut.write(bit);
+
+        short blockLength = 1;
+
+        while (!BinaryStdIn.isEmpty())
+        {
+            // Get the next bit in the sequence.
+            boolean nextBit = BinaryStdIn.readBoolean();
+
+            // If this next bit differs from the first bit we got, end the block and write out the size.
+            if (bit != nextBit)
+            {
+                // Write out the blockLength for BLOCK_SIZE - 1 bits.
+                BinaryStdOut.write(blockLength, BLOCK_SIZE - 1);
+
+                bit = nextBit;
+                blockLength = 1;
+
+                BinaryStdOut.write(bit);
+            }
+            else
+            {
+                blockLength++;
+            }
+        }
+
+        // Write the final block length for the last block
+        BinaryStdOut.write(blockLength, BLOCK_SIZE - 1);
 
         BinaryStdOut.close();
     }
@@ -42,9 +75,23 @@ public class BitmapCompressor {
      * Reads a sequence of bits from standard input, decodes it,
      * and writes the results to standard output.
      */
-    public static void expand() {
+    public static void expand()
+    {
 
-        // TODO: complete expand()
+        boolean bitToPrint;
+        int numBitsToPrint;
+
+        while (!BinaryStdIn.isEmpty())
+        {
+            bitToPrint = BinaryStdIn.readBoolean();
+
+            numBitsToPrint = BinaryStdIn.readInt(BLOCK_SIZE - 1);
+
+            for (int i = 0; i < numBitsToPrint; i++)
+            {
+                BinaryStdOut.write(bitToPrint);
+            }
+        }
 
         BinaryStdOut.close();
     }
