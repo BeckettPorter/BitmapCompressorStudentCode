@@ -23,7 +23,7 @@
  *  @author Robert Sedgewick
  *  @author Kevin Wayne
  *  @author Zach Blick
- *  @author YOUR NAME HERE
+ *  @author Beckett Porter
  */
 public class BitmapCompressor
 {
@@ -38,33 +38,43 @@ public class BitmapCompressor
     public static void compress()
     {
         boolean bit;
+        boolean nextBit;
         short length;
-        // Set the nextBit to the first bit here so that logic below will work so that nextBit can be carried
-        // over throughout subsequent runs through the main while loop.
-        boolean nextBit = BinaryStdIn.readBoolean();
+        boolean firstBitCheckCompleted = false;
+
+        nextBit = BinaryStdIn.readBoolean();
 
         while (!BinaryStdIn.isEmpty())
         {
-            // First bit is what the block is (either 1 or 0) and the next BLOCK_LENGTH - 1 are the length of the block.
+            // Set bit to the next bit and then get a new next bit to move the search window forward by one.
             bit = nextBit;
 
-            // Write the initial bit to indicate what this block represents (Either a 0 or 1).
-            BinaryStdOut.write(bit);
+            // This is a check to make sure we write out an empty block if the sequence starts with a 1.
+            // (this is because we assume in the decompressor that we always start with 0)
+            if (!firstBitCheckCompleted && bit)
+            {
+                writeEmptyBlock();
+            }
+            firstBitCheckCompleted = true;
 
             // Get the next bit in the sequence.
             nextBit = BinaryStdIn.readBoolean();
 
+
             // Set the sequence length to 1 to show it is a new block.
             length = 1;
 
-            // If this next bit differs from the first bit we got (the one indicating what the block represents),
+            // If this next bit differs from the bit we currently have,
             // end the block and write out the size.
             while (bit == nextBit)
             {
-                // Check if the sequence length will overflow the allocated block size, and if so,
-                // break and start a new block.
-                if (length >= Math.pow(2, BLOCK_SIZE - 1) - 1)
+                // If the length is going to overflow the block size, write out the current length and then
+                // set length to 0 and break from the while loop; this will write
+                // out the empty block in the write after the while loop.
+                if (length >= Math.pow(2, BLOCK_SIZE) - 1)
                 {
+                    BinaryStdOut.write(length, BLOCK_SIZE);
+                    length = 0;
                     break;
                 }
 
@@ -82,8 +92,8 @@ public class BitmapCompressor
                     break;
                 }
             }
-            // Write out the length of the found sequence for BLOCK_SIZE - 1 bits.
-            BinaryStdOut.write(length, BLOCK_SIZE - 1);
+            // Write out the length of the found sequence for BLOCK_SIZE bits.
+            BinaryStdOut.write(length, BLOCK_SIZE);
         }
 
         BinaryStdOut.close();
@@ -96,17 +106,17 @@ public class BitmapCompressor
     public static void expand()
     {
         // Instance variables for the bit indicating what the block type is and the number of these bits to print.
-        boolean bitToPrint;
+        boolean bitToPrint = true;
         int numBitsToPrint;
 
         // Go until there is no more input to be read.
         while (!BinaryStdIn.isEmpty())
         {
             // The initial bit in the block is what type of bit the block represents.
-            bitToPrint = BinaryStdIn.readBoolean();
+            bitToPrint = !bitToPrint;
 
             // Then read the next BLOCK_SIZE - 1 bits which indicates the number of these bits to write out.
-            numBitsToPrint = BinaryStdIn.readInt(BLOCK_SIZE - 1);
+            numBitsToPrint = BinaryStdIn.readInt(BLOCK_SIZE);
 
             // Then write out that number of those bits.
             for (int i = 0; i < numBitsToPrint; i++)
@@ -116,6 +126,11 @@ public class BitmapCompressor
         }
 
         BinaryStdOut.close();
+    }
+
+    private static void writeEmptyBlock()
+    {
+        BinaryStdOut.write(0, BLOCK_SIZE);
     }
 
     /**
